@@ -1,0 +1,24 @@
+{
+  "public_origin": "https://demo.invalid",
+  "prefix": "/edge",
+  "scenarios": [
+    {
+      "name": "correct",
+      "root_path": "/edge",
+      "strip_prefix": true,
+      "trust_forwarded": true
+    },
+    {
+      "name": "missing-root-path",
+      "root_path": "",
+      "strip_prefix": true,
+      "trust_forwarded": true
+    },
+    {
+      "name": "untrusted-forwarding",
+      "root_path": "/edge",
+      "strip_prefix": true,
+      "trust_forwarded": false
+    }
+  ]
+}

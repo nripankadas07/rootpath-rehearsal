@@ -1,0 +1,130 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proxy wiring rehearsal</title><style>body{font:16px/1.6 system-ui;background:#f3f6fa;color:#182438;max-width:1100px;margin:40px auto;padding:0 24px}header{border-bottom:3px solid #137a68;padding-bottom:24px}h1{font-size:2.25rem;line-height:1.15;max-width:800px}h2{margin-top:40px;font-size:1.2rem}.cards{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}.card{background:white;padding:16px 22px;border:1px solid #d2dae5;border-radius:10px;min-width:140px}.card b{display:block;font-size:1.7rem;color:#0b6555}table{border-collapse:collapse;width:100%;background:white;margin-bottom:22px;display:block;overflow:auto}th,td{text-align:left;padding:12px;border-bottom:1px solid #d6deea;vertical-align:top}th{background:#e3eaf2}td{overflow-wrap:anywhere}input{font:inherit;padding:10px;width:min(90%,600px);border:1px solid #8593a6;border-radius:6px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:white;padding:20px;border:1px solid #d2dae5}.status{font-weight:700;color:#0b6555}footer{margin-top:40px;color:#4a5b73}details{margin-top:30px}label{display:block}</style><header><p>LOCAL DIAGNOSTICS · SYNTHETIC EXAMPLE WHEN USING THE BUNDLED FIXTURE</p><h1>Proxy wiring rehearsal</h1><p>Local ASGI probes compare public redirects, documentation URLs and OpenAPI server prefixes.</p><p class="status">Review scenario differences</p></header><div class="cards"><div class="card">Scenarios<b>3</b></div><div class="card">Passing scenarios<b>1</b></div></div><label>Filter evidence rows <input id="q" type="search" placeholder="Service, key, group, path or finding"></label><h2>correct · Pass</h2><table><thead><tr><th>Public path</th><th>Status</th><th>Redirect / schema URL</th></tr></thead><tbody><tr><td>/edge/items</td><td>307</td><td>https://demo.invalid/edge/items/</td></tr><tr><td>/edge/docs</td><td>200</td><td>https://demo.invalid/edge/openapi.json</td></tr><tr><td>/edge/openapi.json</td><td>200</td><td></td></tr></tbody></table><table><thead><tr><th>Finding</th><th>Path</th><th>Evidence</th></tr></thead><tbody></tbody></table><h2>missing-root-path · Review</h2><table><thead><tr><th>Public path</th><th>Status</th><th>Redirect / schema URL</th></tr></thead><tbody><tr><td>/edge/items</td><td>307</td><td>https://demo.invalid/items/</td></tr><tr><td>/edge/docs</td><td>200</td><td>https://demo.invalid/openapi.json</td></tr><tr><td>/edge/openapi.json</td><td>200</td><td></td></tr></tbody></table><table><thead><tr><th>Finding</th><th>Path</th><th>Evidence</th></tr></thead><tbody><tr><td>redirect_escapes_public_base</td><td>/edge/items</td><td>{&quot;path&quot;: &quot;/edge/items&quot;, &quot;kind&quot;: &quot;redirect_escapes_public_base&quot;, &quot;target&quot;: &quot;https://demo.invalid/items/&quot;}</td></tr><tr><td>redirect_target_error</td><td>/edge/items</td><td>{&quot;path&quot;: &quot;/edge/items&quot;, &quot;kind&quot;: &quot;redirect_target_error&quot;, &quot;status&quot;: 404}</td></tr><tr><td>docs_schema_unreachable</td><td>/edge/docs</td><td>{&quot;path&quot;: &quot;/edge/docs&quot;, &quot;kind&quot;: &quot;docs_schema_unreachable&quot;, &quot;target&quot;: &quot;https://demo.invalid/openapi.json&quot;, &quot;status&quot;: 404}</td></tr><tr><td>openapi_public_base_missing</td><td>/edge/openapi.json</td><td>{&quot;path&quot;: &quot;/edge/openapi.json&quot;, &quot;kind&quot;: &quot;openapi_public_base_missing&quot;, &quot;expected&quot;: &quot;/edge&quot;, &quot;servers&quot;: []}</td></tr></tbody></table><h2>untrusted-forwarding · Review</h2><table><thead><tr><th>Public path</th><th>Status</th><th>Redirect / schema URL</th></tr></thead><tbody><tr><td>/edge/items</td><td>307</td><td>http://upstream.invalid/edge/items/</td></tr><tr><td>/edge/docs</td><td>200</td><td>https://demo.invalid/edge/openapi.json</td></tr><tr><td>/edge/openapi.json</td><td>200</td><td></td></tr></tbody></table><table><thead><tr><th>Finding</th><th>Path</th><th>Evidence</th></tr></thead><tbody><tr><td>redirect_escapes_public_base</td><td>/edge/items</td><td>{&quot;path&quot;: &quot;/edge/items&quot;, &quot;kind&quot;: &quot;redirect_escapes_public_base&quot;, &quot;target&quot;: &quot;http://upstream.invalid/edge/items/&quot;}</td></tr></tbody></table><details><summary>Complete JSON evidence</summary><pre>{
+  &quot;schema&quot;: &quot;rootpath-rehearsal/v1&quot;,
+  &quot;public_base&quot;: &quot;https://demo.invalid/edge&quot;,
+  &quot;scenarios&quot;: [
+    {
+      &quot;name&quot;: &quot;correct&quot;,
+      &quot;configuration&quot;: {
+        &quot;name&quot;: &quot;correct&quot;,
+        &quot;root_path&quot;: &quot;/edge&quot;,
+        &quot;strip_prefix&quot;: true,
+        &quot;trust_forwarded&quot;: true
+      },
+      &quot;responses&quot;: [
+        {
+          &quot;path&quot;: &quot;/edge/items&quot;,
+          &quot;status&quot;: 307,
+          &quot;location&quot;: &quot;https://demo.invalid/edge/items/&quot;,
+          &quot;redirect_target_status&quot;: 200
+        },
+        {
+          &quot;path&quot;: &quot;/edge/docs&quot;,
+          &quot;status&quot;: 200,
+          &quot;docs_schema_url&quot;: &quot;https://demo.invalid/edge/openapi.json&quot;,
+          &quot;docs_schema_status&quot;: 200
+        },
+        {
+          &quot;path&quot;: &quot;/edge/openapi.json&quot;,
+          &quot;status&quot;: 200,
+          &quot;openapi_servers&quot;: [
+            &quot;/edge&quot;
+          ]
+        }
+      ],
+      &quot;findings&quot;: [],
+      &quot;passed&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;missing-root-path&quot;,
+      &quot;configuration&quot;: {
+        &quot;name&quot;: &quot;missing-root-path&quot;,
+        &quot;root_path&quot;: &quot;&quot;,
+        &quot;strip_prefix&quot;: true,
+        &quot;trust_forwarded&quot;: true
+      },
+      &quot;responses&quot;: [
+        {
+          &quot;path&quot;: &quot;/edge/items&quot;,
+          &quot;status&quot;: 307,
+          &quot;location&quot;: &quot;https://demo.invalid/items/&quot;,
+          &quot;redirect_target_status&quot;: 404
+        },
+        {
+          &quot;path&quot;: &quot;/edge/docs&quot;,
+          &quot;status&quot;: 200,
+          &quot;docs_schema_url&quot;: &quot;https://demo.invalid/openapi.json&quot;,
+          &quot;docs_schema_status&quot;: 404
+        },
+        {
+          &quot;path&quot;: &quot;/edge/openapi.json&quot;,
+          &quot;status&quot;: 200,
+          &quot;openapi_servers&quot;: []
+        }
+      ],
+      &quot;findings&quot;: [
+        {
+          &quot;path&quot;: &quot;/edge/items&quot;,
+          &quot;kind&quot;: &quot;redirect_escapes_public_base&quot;,
+          &quot;target&quot;: &quot;https://demo.invalid/items/&quot;
+        },
+        {
+          &quot;path&quot;: &quot;/edge/items&quot;,
+          &quot;kind&quot;: &quot;redirect_target_error&quot;,
+          &quot;status&quot;: 404
+        },
+        {
+          &quot;path&quot;: &quot;/edge/docs&quot;,
+          &quot;kind&quot;: &quot;docs_schema_unreachable&quot;,
+          &quot;target&quot;: &quot;https://demo.invalid/openapi.json&quot;,
+          &quot;status&quot;: 404
+        },
+        {
+          &quot;path&quot;: &quot;/edge/openapi.json&quot;,
+          &quot;kind&quot;: &quot;openapi_public_base_missing&quot;,
+          &quot;expected&quot;: &quot;/edge&quot;,
+          &quot;servers&quot;: []
+        }
+      ],
+      &quot;passed&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;untrusted-forwarding&quot;,
+      &quot;configuration&quot;: {
+        &quot;name&quot;: &quot;untrusted-forwarding&quot;,
+        &quot;root_path&quot;: &quot;/edge&quot;,
+        &quot;strip_prefix&quot;: true,
+        &quot;trust_forwarded&quot;: false
+      },
+      &quot;responses&quot;: [
+        {
+          &quot;path&quot;: &quot;/edge/items&quot;,
+          &quot;status&quot;: 307,
+          &quot;location&quot;: &quot;http://upstream.invalid/edge/items/&quot;
+        },
+        {
+          &quot;path&quot;: &quot;/edge/docs&quot;,
+          &quot;status&quot;: 200,
+          &quot;docs_schema_url&quot;: &quot;https://demo.invalid/edge/openapi.json&quot;,
+          &quot;docs_schema_status&quot;: 200
+        },
+        {
+          &quot;path&quot;: &quot;/edge/openapi.json&quot;,
+          &quot;status&quot;: 200,
+          &quot;openapi_servers&quot;: [
+            &quot;/edge&quot;
+          ]
+        }
+      ],
+      &quot;findings&quot;: [
+        {
+          &quot;path&quot;: &quot;/edge/items&quot;,
+          &quot;kind&quot;: &quot;redirect_escapes_public_base&quot;,
+          &quot;target&quot;: &quot;http://upstream.invalid/edge/items/&quot;
+        }
+      ],
+      &quot;passed&quot;: false
+    }
+  ],
+  &quot;needs_review&quot;: true,
+  &quot;scope&quot;: &quot;In-process ASGI model. No DNS, TLS, sockets, real reverse proxy, lifespan startup or production access.&quot;
+}</pre></details><footer>Read the repository limitations before acting. These results describe supplied inputs; they do not certify a live system.</footer><script>document.querySelector("#q").addEventListener("input",e=>{const q=e.target.value.toLowerCase();document.querySelectorAll("tbody tr").forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(q))});</script></html>

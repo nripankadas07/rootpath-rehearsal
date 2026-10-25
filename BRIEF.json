@@ -1,0 +1,39 @@
+{
+  "title": "Rootpath Rehearsal",
+  "user": "FastAPI developers serving applications beneath a reverse-proxy prefix",
+  "problem": "An endpoint can work while redirects point at an internal host or the documentation requests an unreachable OpenAPI schema.",
+  "capability": "Replay public-path probes through a local ASGI proxy model and compare redirect targets, docs schema URLs and OpenAPI server prefixes across configurations.",
+  "anchor": "fastapi/fastapi",
+  "pin": "FastAPI 0.162.0 and HTTPX 0.28.1. The scope model follows Uvicorn full-path construction in https://github.com/Kludex/uvicorn/blob/main/uvicorn/protocols/http/h11_impl.py",
+  "alternatives": [
+    "fastapi/fastapi",
+    "encode/httpx",
+    "Kludex/uvicorn"
+  ],
+  "query": "api framework stars:>10000 archived:false sort:stars; fastapi proxy test sort:stars",
+  "evidence": [
+    "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/advanced/behind-a-proxy.md",
+    "https://github.com/fastapi/fastapi/issues/829"
+  ],
+  "demand": "The current official proxy guide describes the concrete redirect and stripped-prefix problems. Issue829 is historical and closed; this tool does not claim the framework still has that bug. A reusable multi-scenario rehearsal is an inferred need.",
+  "addition": "FastAPI documents the configuration, Uvicorn serves ASGI applications and HTTPX provides a transport. This project assembles a repeatable public-URL contract with specific diagnoses. It is a local model, not a replacement for a real proxy deployment test.",
+  "outcome": "The correct invented /edge scenario passes. Omitting root_path breaks docs/public redirects; rejecting forwarded-origin information exposes an internal-origin redirect.",
+  "acceptance": [
+    "Correct wiring reaches the docs schema and preserves HTTPS /edge redirect targets.",
+    "Wrong root path and forwarded-origin scenarios produce specific findings.",
+    "A supplied local factory receives requests without external network access.",
+    "Scenario app instances do not share an OpenAPI cache."
+  ],
+  "fields": "Supply an HTTP(S) `public_origin` without credentials, a plain `prefix`, a scenarios array and optional local `probes`. Each scenario names root_path, strip_prefix, trust_forwarded and optional upstream_origin. Defaults use the bundled invented FastAPI app. `--factory MODULE:FUNCTION` imports your own local code and creates a fresh ASGI application per scenario.",
+  "limits": "4 MiB JSON; 1..20 scenarios and 1..20 probes; each local probe has a five-second deadline. Plain paths only. No sockets, DNS, TLS, actual proxy, WebSockets, authentication, lifespan startup or production access are tested. Factory imports and GET handlers execute your code; use a safe test application and isolated fixtures. Forwarding trust here is a simulation setting, not advice to trust arbitrary headers on a deployed server.",
+  "distinction": "Existing http-range-witness and cookie-scope-witness explain protocol semantics; api-mocker supplies mocks. This tool executes ASGI URL wiring contracts against a real FastAPI application.",
+  "maintenance": "Pinned FastAPI and HTTPX dependencies. Recheck ASGI server root_path construction and Starlette redirect behavior on upgrades. No claim of end-to-end TLS or network compatibility.",
+  "discovery": "A three-scenario HTML comparison showing working versus broken /edge routes, plus a factory example for local applications.",
+  "rank": 3,
+  "identity": "rootpath-rehearsal",
+  "date": "2026-10-25",
+  "state": "VALIDATED",
+  "demand_status": "Inferred demand for this specific project; linked upstream evidence is qualified below.",
+  "no_performance_claim": true,
+  "no_upstream_affiliation": true
+}

@@ -1,0 +1,130 @@
+{
+  "needs_review": true,
+  "public_base": "https://demo.invalid/edge",
+  "scenarios": [
+    {
+      "configuration": {
+        "name": "correct",
+        "root_path": "/edge",
+        "strip_prefix": true,
+        "trust_forwarded": true
+      },
+      "findings": [],
+      "name": "correct",
+      "passed": true,
+      "responses": [
+        {
+          "location": "https://demo.invalid/edge/items/",
+          "path": "/edge/items",
+          "redirect_target_status": 200,
+          "status": 307
+        },
+        {
+          "docs_schema_status": 200,
+          "docs_schema_url": "https://demo.invalid/edge/openapi.json",
+          "path": "/edge/docs",
+          "status": 200
+        },
+        {
+          "openapi_servers": [
+            "/edge"
+          ],
+          "path": "/edge/openapi.json",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "configuration": {
+        "name": "missing-root-path",
+        "root_path": "",
+        "strip_prefix": true,
+        "trust_forwarded": true
+      },
+      "findings": [
+        {
+          "kind": "redirect_escapes_public_base",
+          "path": "/edge/items",
+          "target": "https://demo.invalid/items/"
+        },
+        {
+          "kind": "redirect_target_error",
+          "path": "/edge/items",
+          "status": 404
+        },
+        {
+          "kind": "docs_schema_unreachable",
+          "path": "/edge/docs",
+          "status": 404,
+          "target": "https://demo.invalid/openapi.json"
+        },
+        {
+          "expected": "/edge",
+          "kind": "openapi_public_base_missing",
+          "path": "/edge/openapi.json",
+          "servers": []
+        }
+      ],
+      "name": "missing-root-path",
+      "passed": false,
+      "responses": [
+        {
+          "location": "https://demo.invalid/items/",
+          "path": "/edge/items",
+          "redirect_target_status": 404,
+          "status": 307
+        },
+        {
+          "docs_schema_status": 404,
+          "docs_schema_url": "https://demo.invalid/openapi.json",
+          "path": "/edge/docs",
+          "status": 200
+        },
+        {
+          "openapi_servers": [],
+          "path": "/edge/openapi.json",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "configuration": {
+        "name": "untrusted-forwarding",
+        "root_path": "/edge",
+        "strip_prefix": true,
+        "trust_forwarded": false
+      },
+      "findings": [
+        {
+          "kind": "redirect_escapes_public_base",
+          "path": "/edge/items",
+          "target": "http://upstream.invalid/edge/items/"
+        }
+      ],
+      "name": "untrusted-forwarding",
+      "passed": false,
+      "responses": [
+        {
+          "location": "http://upstream.invalid/edge/items/",
+          "path": "/edge/items",
+          "status": 307
+        },
+        {
+          "docs_schema_status": 200,
+          "docs_schema_url": "https://demo.invalid/edge/openapi.json",
+          "path": "/edge/docs",
+          "status": 200
+        },
+        {
+          "openapi_servers": [
+            "/edge"
+          ],
+          "path": "/edge/openapi.json",
+          "status": 200
+        }
+      ]
+    }
+  ],
+  "schema": "rootpath-rehearsal/v1",
+  "scope": "In-process ASGI model. No DNS, TLS, sockets, real reverse proxy, lifespan startup or production access."
+}
